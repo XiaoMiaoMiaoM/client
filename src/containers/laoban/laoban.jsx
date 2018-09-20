@@ -1,8 +1,18 @@
 import React,{Component} from 'react'
-export default class Laoban extends Component{
+import {connect} from 'react-redux'
+import {getUserList} from "../../redux/actions";
+
+ class Laoban extends Component{
+   componentDidMount(){
+     this.props.getUserList('dashen')
+   }
   render(){
     return(
-      <div>老板列表</div>
+          <UserList userList={this.props.userList}/>
     )
   }
 }
+export default connect(
+  state => ({userList: state.userList}),
+  {getUserList}
+)(Laoban)

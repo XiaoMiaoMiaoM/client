@@ -11,12 +11,12 @@ import Laoban from '../laoban/laoban'
 import Message from '../message/message'
 import Personal from '../personal/personal'
 import NavFooter from '../../componnets/nav-footer/nav-footer'
+import {getUser} from "../../redux/actions";
+import {getRedirectPath} from "../../utils/index";
+import Chat from '../chat/chat'
 
 
-
-
-
- class Main extends Component{
+class Main extends Component{
    navList = [
      {
        path: '/laoban', // 路由路径
@@ -47,13 +47,30 @@ import NavFooter from '../../componnets/nav-footer/nav-footer'
        text: '个人',
      }
    ]
+   componentDidMount() {
+     const userid=Cookies.get('userid')
+     const {_id}=this.props.user
+     if(userid&&!_id){
+       this.props.getUser()
+     }
+   }
 
    render () {
      // 判断用户是否登陆(cookie中是否有userid), 如果没有, 自动跳转到登陆界面
      const userid = Cookies.get('userid')
      if(!userid) {
        return <Redirect to='/login'/>
-     }        
+     }
+     const {user} = this.props
+     if(!user._id){
+       return <div>LOADING...</div>
+     }
+     // 3. 如果redux的user中已经有信息(已经登陆), 如果请求的是应用根路径, 自动跳转到对应的主界面
+     // 当前请求的path
+     const path= this.props.location.pathname
+     if (path==='/'){
+       return <Redirect to={getRedirectPath(user.type,user.header)}/>
+     }
 
 
      const navList = this.navList
@@ -83,6 +100,7 @@ import NavFooter from '../../componnets/nav-footer/nav-footer'
            <Route path='/dashen' component={Dashen}/>
            <Route path='/message' component={Message}/>
            <Route path='/personal' component={Personal}/>
+           <Route path='/chat/:userid' component={Chat}/>
          </Switch>
 
          {currentNav ? <NavFooter navList={this.navList}/> : null}
@@ -93,5 +111,5 @@ import NavFooter from '../../componnets/nav-footer/nav-footer'
 }
 export default connect(
   state=>({user:state.user}),
-  {}
+  {getUser}
 )(Main)

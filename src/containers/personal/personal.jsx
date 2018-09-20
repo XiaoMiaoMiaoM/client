@@ -1,8 +1,13 @@
 import React,{Component} from 'react'
-export default class Personal extends Component{
+import {connect} from 'react-redux'
+class Personal extends Component{
   render(){
     return(
-      <div>个人中心</div>
+      <div>Personal</div>
     )
   }
 }
+export default connect(
+  state =>({}),
+  {}
+)(Personal)
